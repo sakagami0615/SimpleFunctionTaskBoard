@@ -1,0 +1,47 @@
+.task {
+	background-color: #F4CE46;
+}
+.todo {
+	background-color: #2A92BF;
+}
+.doing {
+	background-color: #00B961;
+}
+.done {
+	background-color: #888888;
+}
+.custom-button {
+	background-color: #4CAF50;
+	border: none;
+	color: white;
+	padding: 7px 15px;
+	margin: 10px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+}
+.submit-button {
+	background-color: #2fbcd4;
+	border: none;
+	color: white;
+	padding: 4px 6px;
+	margin: 5px 0px;
+	text-align: center;
+	text-decoration: none;
+	font-size: 14px;
+}
+.cancel-button {
+	background-color: #555555;
+	border: none;
+	color: white;
+	padding: 4px 6px;
+	margin: 5px 5px;
+	text-align: center;
+	text-decoration: none;
+	font-size: 14px;
+}
+
+#dust_region {
+	position: absolute;
+}
