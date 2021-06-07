@@ -1,25 +1,31 @@
+// ボードのID
+const boardIds = [
+	"sample-board-1",
+	"sample-board-2",
+	"sample-board-3",
+	"sample-board-4"
+]
 
-const defaultBoards = [
+
+// ボードの初期情報
+const initBoards = [
 	{
 		"id": "sample-board-1",
 		"title": "All Task",
 		"class": "task",
-		"item": [
-			{ "title": "報告書の作成" },
-			{ "title": "14時から打ち合わせ" }
-		]
+		"item": []
 	},
 	{
 		"id": "sample-board-2",
 		"title": "Today To Do",
 		"class": "todo",
-		"item": [{ "title": "○○案の企画書作成" }]
+		"item": []
 	},
 	{
 		"id": "sample-board-3",
 		"title": "Doing",
 		"class": "doing",
-		"item": [{ "title": "日報の提出" }]
+		"item": []
 	},
 	{
 		"id": "sample-board-4",
@@ -29,17 +35,28 @@ const defaultBoards = [
 	}
 ];
 
+
+// ----------------------------------------------------------------------------------------------------
+// タスク読み込み/書き込みイベント設定
+// ----------------------------------------------------------------------------------------------------
+let loadButton = document.getElementById("load-task-button");
+loadButton.addEventListener("change", loadTaskFile);
+
+let saveButton = document.getElementById("save-task-button");
+saveButton.addEventListener("click", saveTaskFile);
+
+
 // ----------------------------------------------------------------------------------------------------
 // ゴミ箱領域を描画
 // (黒線の右側にアイテムをドロップすると削除される)
 // ----------------------------------------------------------------------------------------------------
-const dust_area_x = 1150;
+const dustAreaX = 1150;
 let canvas = document.getElementById("dust_region");
 let context = canvas.getContext('2d');
 
 context.beginPath();							// パスをリセット
-context.moveTo(dust_area_x, 0);					// 開始地点に移動
-context.lineTo(dust_area_x, canvas.height);		// 線を引く
+context.moveTo(dustAreaX, 0);					// 開始地点に移動
+context.lineTo(dustAreaX, canvas.height);		// 線を引く
 context.strokeStyle = "#555555";				// 色指定
 context.lineWidth = 6;							// 線の太さ指定
 context.stroke();								// 線を描画
@@ -66,7 +83,7 @@ const kanban = new jKanban({
 	element: '#kanban',			// タスク管理ボードを表示させたいHTML要素
 	gutter: '15px',				// ボード同士の間隔
 	widthBoard: '250px',		// ボードのサイズ
-	boards: defaultBoards,		// 初期状態のボードの中身をJSONで指定
+	boards: initBoards,			// 初期状態のボードの中身をJSONで指定
 	dragBoards: false,			// ボードのドラッグ
 	addItemButton: true,		// タスク追加用のボタンを表示
 	itemAddOptions: {
@@ -75,7 +92,6 @@ const kanban = new jKanban({
 		class: 'custom-button',
 		footer: true
 	},
-
 	
 	dragendEl: (elem) => removeElement(elem, mouseX, mouseY),	// タスクの削除
 	click: (elem) => editFormElement(elem),						// タスクのリネーム
@@ -133,7 +149,76 @@ function editFormElement(elem) {
 // ----------------------------------------------------------------------------------------------------
 function removeElement(elem, mouseX, mouseY) {
 	// 領域外にドロップしたアイテムを削除
-	if (mouseX > dust_area_x) {
+	if (mouseX > dustAreaX) {
 		kanban.removeElement(elem);
 	}
+}
+
+
+// ----------------------------------------------------------------------------------------------------
+// タスクファイル読み込みイベント
+// ----------------------------------------------------------------------------------------------------
+function loadTaskFile(event) {
+	// FileReaderの作成
+	const reader = new FileReader();
+	// テキスト形式で読み込む
+	const loadfile = event.target.files;
+	reader.readAsText(loadfile[0]);
+
+	// 読込終了後の処理
+	reader.onload = function () {
+		// 辞書に変換
+		const loadBoards = JSON.parse(reader.result);
+
+		// 現在のボードのアイテムを削除
+		boardIds.filter(function (id) {
+			let elems = kanban.getBoardElements(id);
+			// 配列に変換
+			elems = [].map.call(elems, (elem) => {
+				return elem;
+			});
+			// ボードの下から順にアイテムを削除
+			elems.reverse().map(function (elem) {
+				kanban.removeElement(elem);
+			});
+		});
+
+		// 読み込んだタスクをボードに追加
+		boardIds.filter(function (id) {
+			// ボードに追加するデータを抽出
+			const targetBoard = loadBoards.board.find((board) => board.id === id);
+			targetBoard.item.map(function (item) {
+				kanban.addElement(id, item);
+			});
+		});
+	}
+}
+
+
+
+// ----------------------------------------------------------------------------------------------------
+// タスクファイル書き込みイベント
+// ----------------------------------------------------------------------------------------------------
+function saveTaskFile() {
+	
+	// 保存用変数を初期化
+	let saveBoards = {board: initBoards};
+
+	// ボードごとにアイテムを所得し、保存用変数に格納
+	boardIds.filter(function (id) {
+		const elems = kanban.getBoardElements(id);
+		const items = [].map.call(elems, (elem) => {
+			return {title: elem.innerHTML};
+		});
+		// 格納先のインデックスを取得し、アイテムを格納
+		const boardIndex = saveBoards.board.findIndex((board) => board.id === id);
+		saveBoards.board[boardIndex].item = items;
+	});
+
+	// 辞書をテキストに変換
+	const saveText = JSON.stringify(saveBoards);
+
+	// 変換後のテキストを保存
+	let blob = new Blob([saveText],{type:"text/plan"});
+	document.getElementById("save-task-button").href = window.URL.createObjectURL(blob);
 }

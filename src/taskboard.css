@@ -1,3 +1,6 @@
+.button-margin {
+	margin: 10px;
+}
 .task {
 	background-color: #F4CE46;
 }
@@ -41,7 +44,6 @@
 	text-decoration: none;
 	font-size: 14px;
 }
-
 #dust_region {
 	position: absolute;
 }

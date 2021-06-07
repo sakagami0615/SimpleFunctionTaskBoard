@@ -1,0 +1,1 @@
+{"board":[{"id":"sample-board-1","title":"All Task","class":"task","item":[{"title":"作業A"}]},{"id":"sample-board-2","title":"Today To Do","class":"todo","item":[{"title":"作業B"}]},{"id":"sample-board-3","title":"Doing","class":"doing","item":[{"title":"作業C"}]},{"id":"sample-board-4","title":"Done","class":"done","item":[{"title":"作業D"}]}]}
